@@ -1196,7 +1196,7 @@ class MACRO_VRNN(nn.Module):
 
                     # objective function
                     if self.pred_type == 2:
-                        pulse_loss = nn.BCEWithLogitsLoss() # BCELossから変更
+                        pulse_loss = nn.BCELoss()
                     elif self.pred_type == 3:
                         pulse_loss = nn.MSELoss()
                     else:
@@ -2249,7 +2249,7 @@ class MACRO_VRNN(nn.Module):
                         dec_std_t = torch.zeros(dec_mean_t.shape).to(device)
                     # objective function
                     if self.pred_type == 2:
-                        pulse_loss = nn.BCEWithLogitsLoss()
+                        pulse_loss = nn.BCELoss()
                     elif self.pred_type == 3:
                         pulse_loss = nn.MSELoss()
                     else:
