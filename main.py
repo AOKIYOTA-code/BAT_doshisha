@@ -201,7 +201,23 @@ def run_epoch(train, rollout, hp, samples, samples_true):
             else:
                 batch_losses, batch_losses2 = model(data, rollout, train, hp=hp)
             optimizer.zero_grad()
-            total_loss = sum(batch_losses.values())
+            #total_loss = sum(batch_losses.values())
+            #total_loss = sum(batch_losses.values())
+            
+            # 損失の重み付け
+            # 軌跡の予測精度を重視するため、L_recに大きな重みを設定
+            weight_rec = 50.0  # 軌跡(velocity)の再構成損失の重み
+            weight_pulse = 1.0  # パルスフラグ損失の重み
+
+            total_loss = 0
+            for key, value in batch_losses.items():
+                if key == 'L_rec':
+                    total_loss += value * weight_rec
+                elif key == 'L_pulse_flag':
+                    total_loss += value * weight_pulse
+                else:
+                    total_loss += value # その他の損失は重み1.0
+
             total_loss.backward()
             input_gradients = data.grad.cpu().numpy()  # Shape: (batch_size, seq_len, input_size)
             input_gradients_mean = input_gradients.mean(axis=(0, 1))  # Shape: (input_size,)
@@ -705,7 +721,7 @@ if __name__ == "__main__":
 
     # test pickle load
     with open(
-        os.path.dirname(game_files) + "/dataset_pd_yubi_add.pkl",
+        os.path.dirname(game_files) + "/dataset_pd_yubi_new.pkl",
         "rb",
     ) as f:
         X_data_all = pickle.load(f)

@@ -8,7 +8,7 @@ import statistics
 from matplotlib.backends.backend_pdf import PdfPages
 
 
-path = r"C:\Users\yota-\OneDrive - 同志社大学\PO-MC-DHVRNN\result\0918"
+path = r"/home/batsimulation/Desktop/PO-MC-DHVRNN/result/20251013"
 with open(os.path.join(path, 'params.p'), 'rb') as f: ###########
     param = np.load(f, allow_pickle=True)
     # print(param)
@@ -19,7 +19,7 @@ with open(os.path.join(path, 'samples.p'), 'rb') as f: ############
 
 # import pdb; pdb.set_trace()
 
-pp = PdfPages(os.path.join(path, 'topview_0.4.pdf')) ##########
+pp = PdfPages(os.path.join(path, 'topview.pdf')) ##########
 
 count = 0
 # ループの前で合計用の変数を初期化
@@ -66,8 +66,8 @@ for episode in range(len(data[0][0][0][0])):
                                 (data[1][0][step][0][episode][1] - data[0][0][step][0][episode][1]) ** 2))
         loss_vel.append(np.sqrt((data[1][0][step][0][episode][2] - data[0][0][step][0][episode][2])** 2 + 
                                 (data[1][0][step][0][episode][3] - data[0][0][step][0][episode][3]) ** 2))
-    print(data[0][0][step][0][episode][7])
-    #print(data[0][0][step][0][episode][7])
+    print(data[1][0][step][0][episode][7])
+    print(data[0][0][step][0][episode][9])
     #print("====================")
 
     # 0.5以上の値を1に変換
@@ -79,7 +79,7 @@ for episode in range(len(data[0][0][0][0])):
     #print(f"0の数: {num_zeros}, 1の数: {num_ones}")
     num_zeros = train_pulse.count(0) + test_pulse.count(0)
     num_ones = train_pulse.count(1) + test_pulse.count(1)
-    print(f"Episode {episode}: 0の数: {num_zeros}, 1の数: {num_ones}")
+    #print(f"Episode {episode}: 0の数: {num_zeros}, 1の数: {num_ones}")
     # 合計に加算
     total_zeros += num_zeros
     total_ones += num_ones
@@ -141,29 +141,31 @@ for episode in range(len(data[0][0][0][0])):
     ax.plot(test_x, test_y, label='predicted flight path',
             color='#d62728', zorder=2, linewidth=3)
     
-    #for i in range(len(train_x_pre)):
-    #    x = train_x_pre[i]
-    #    y = train_y_pre[i]
-    #    if train_pulse[i] >= 0.5:
-    #        angle = data[1][0][predict_time + i][0][episode][7]  # 実測Pxy
-    #        dx = np.cos(angle) * 0.2
-    #        dy = np.sin(angle) * 0.2
-    #       ax.arrow(x, y, dx, dy, head_width=0.1, head_length=0.1, fc='b', ec='b')
+    for i in range(len(train_x_pre)):
+        x = train_x_pre[i]
+        y = train_y_pre[i]
+        if train_pulse[i] >= 0.5:
+            angle_deg = data[1][0][predict_time + i][0][episode][7]  # 実測Pxy
+            angle_rad = np.deg2rad(angle_deg)
+            dx = np.cos(angle_rad) * 0.2
+            dy = np.sin(angle_rad) * 0.2
+            ax.arrow(x, y, dx, dy, head_width=0.1, head_length=0.1, fc='b', ec='b')
 
-    #for i in range(len(test_x)):
-    #    x = test_x[i]
-    #    y = test_y[i]
-    #    # パルス放射タイミングのみ描画
-    #    if test_pulse[i] >= 0.5:
-    #        angle = data[1][0][predict_time + i][0][episode][7]  # 実測Pxyを使用
-    #        dx = np.cos(angle) * 0.2
-    #        dy = np.sin(angle) * 0.2
-    #        ax.arrow(x, y, dx, dy, head_width=0.1, head_length=0.1, fc='r', ec='r')
+    for i in range(len(test_x)):
+        x = test_x[i]
+        y = test_y[i]
+        # パルス放射タイミングのみ描画
+        if test_pulse[i] >= 0.5:
+            angle_test = data[0][0][predict_time + i][0][episode][9]  # 実測Pxyを使用
+            angle_rad_test = np.deg2rad(angle_test)
+            dx = np.cos(angle_rad_test) * 0.2
+            dy = np.sin(angle_rad_test) * 0.2
+            ax.arrow(x, y, dx, dy, head_width=0.1, head_length=0.1, fc='r', ec='r')
 
     for i in range(len(train_pulse)):
-        if train_pulse[i] >= 0.4:
+        if train_pulse[i] >= 0.5:
             ax.scatter(train_x_pre[i], train_y_pre[i], label='measured pulse timing', color='k', s=30, zorder=3)
-        if test_pulse[i] >= 0.4:
+        if test_pulse[i] >= 0.5:
             ax.scatter(test_x[i], test_y[i], label='predicted pulse timing', color='w',edgecolor = '#d62728' ,s=30, zorder=3)
     #print(test_pulse[i])
 

@@ -137,19 +137,26 @@ def vertical_angle(x, y, z):
 
 def rotation(x: list, y: list, pulse_directions: float):
     """
-    座標を±40°回転
+    進行方向を基準に、pulse_directions分回転させ、そこから±40°の範囲でビームを放射する。
     """
     rads = [np.deg2rad(round(j*0.01, 1)) for j in range(-4000, 4032, 32)]
     rot_x = []
     rot_y = []
     length = 5
     for i in range(len(x)-1):
-        base_angle_deg = pulse_directions[i]
-        # 0°から360°の範囲の角度を-180°から+180°の範囲に変換
-        if isinstance(base_angle_deg, torch.Tensor):
-            base_angle_deg = base_angle_deg.detach().cpu().numpy()
-        base_angle_deg = base_angle_deg - 360 if base_angle_deg > 180 else base_angle_deg
-        base_angle_rad = np.deg2rad(base_angle_deg) # 基準角度をラジアンに変換
+        # tからt+1への進行方向を計算
+        dx = x[i+1] - x[i]
+        dy = y[i+1] - y[i]
+        travel_direction_rad = np.arctan2(dy, dx)
+
+        # 進行方向からのずれを取得
+        pulse_direction_deg = pulse_directions[i]
+        if isinstance(pulse_direction_deg, torch.Tensor):
+            pulse_direction_deg = pulse_direction_deg.detach().numpy()
+
+        pulse_direction_rad = np.deg2rad(pulse_direction_deg)
+        # 基準となる角度（進行方向＋ずれ）
+        base_angle_rad = travel_direction_rad + pulse_direction_rad
         rads_rotated = [rad + base_angle_rad for rad in rads]
         cos_list = np.cos(rads_rotated)
         sin_list = np.sin(rads_rotated)
