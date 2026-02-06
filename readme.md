@@ -21,6 +21,6 @@ pip install -r requirements.txt
 ## Usage
 
 ```
-* python main.py --data bat --n_GorS 100 --n_roles 1 --batchsize 100 --n_epoch 200 -ev_th 100 --model MACRO_VRNN --attention -1 --acc 0 -t_step 796 --wo_macro --pred_type 1
+* python main.py --data bat --n_GorS 100 --n_roles 1 --batchsize 100 --n_epoch 200 -ev_th 100 --model MACRO_VRNN --attention -1 --acc 0 -t_step 796 --wo_macro --pred_type 2
 ```
 
